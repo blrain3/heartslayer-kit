@@ -16,6 +16,7 @@ EXPECT_CM_SHA="${EXPECT_CM_SHA:-e2d51ad02b3face3dd4cb83d}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 fail(){ echo "GUARD-FAIL: $1"; exit 1; }
 if [ "${WATCHDOG_RECOVER:-}" != "1" ]; then mkdir -p $P/watchdog-state; echo 0 > $P/watchdog-state/recoveries; fi
+[ -f "$CMJAR" ] || fail "CM jar 不存在: $CMJAR（检查 CM_JAR / STEAM_DIR 环境变量）"
 have=$(sha256sum "$CMJAR" | cut -c1-24)
 [ "$have" = "$EXPECT_CM_SHA" ] || fail "CM jar sha=${have}（预期 ${EXPECT_CM_SHA}）——可能被 Steam 回滚，先处理"
 pgrep -f "bottled_ai/main.py" >/dev/null && fail "bot 残留"
