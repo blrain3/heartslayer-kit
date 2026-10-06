@@ -4,6 +4,8 @@ bottled_ai「观者碎心」批次的运营与验证工具包 — 驱动观者�
 
 守卫式启动、对局守望、卡死自愈、离线决策验证；从达成首次碎心击杀的项目中抽取。
 
+> **配套工具包，非独立项目。** 本仓库负责编排与验证一份 [bottled_ai](https://github.com/xaved88/bottled_ai) 环境——**不含**机器人本体、游戏模组与游戏本身。`scripts/` 驱动一套*运行中*的 Steam + ModTheSpire + CommunicationMod + bottled_ai 链路（并读取 bottled_ai 写出的 run 日志）；`tools/` 直接 import bottled_ai 代码（`rs.*`，含 fork 分支 `verify-localization-fix` 的 `OBSERVANT_HEARTSLAYER` 策略）。单独拉取本仓库只得到工具层——机器人本体仍需来自 bottled_ai。
+
 > **里程碑** — 首次击杀碎心：2026-10-05，seed `5N2LLKFRVCE5`，floor 56 / 1180 分，8 回合战斗零空闲回合。
 
 [English](README.md) | **简体中文**

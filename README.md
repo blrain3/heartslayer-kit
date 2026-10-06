@@ -4,6 +4,8 @@ Operations & verification toolkit for **bottled_ai**'s `OBSERVANT_HEARTSLAYER` b
 
 Guarded batch launch, run watching, stall self-healing, and offline decision verification, extracted from the project that achieved the first heart kill.
 
+> **Companion toolkit, not a standalone bot.** This repo orchestrates and verifies a [bottled_ai](https://github.com/xaved88/bottled_ai) setup — it does **not** include the bot, the game mods, or the game. `scripts/` drives a *running* Steam + ModTheSpire + CommunicationMod + bottled_ai chain (and reads the run logs that bottled_ai writes); `tools/` imports the bottled_ai codebase directly (`rs.*`, including the `OBSERVANT_HEARTSLAYER` strategy from the `verify-localization-fix` fork branch). Pulling only this repo gives you the tooling layer — the bot itself still comes from bottled_ai.
+
 > **Milestone** — first Corrupt Heart kill: 2026-10-05, seed `5N2LLKFRVCE5`, floor 56 / score 1180, 8-turn fight with zero idle turns.
 
 **English** | [简体中文](README.zh-CN.md)
