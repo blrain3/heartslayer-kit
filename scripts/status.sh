@@ -3,7 +3,7 @@
 # 用法: BOTTLED_REPO=~/projects/bottled_ai bash status.sh
 R="${BOTTLED_REPO:-$HOME/projects/bottled_ai}"
 [ -d "$R" ] || { echo "bottled_ai 仓库不存在: $R（用 BOTTLED_REPO=... 指定）"; exit 1; }
-cd "$R"
+cd "$R" || exit 1
 echo "T=$(date '+%F %T') bot=$(pgrep -f 'bottled_ai/main.py' >/dev/null && echo alive || echo gone)"
 F=$(ls -t logs/runs/*.log 2>/dev/null | head -1)
 echo "latest: $F"

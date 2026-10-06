@@ -1,11 +1,10 @@
 # heartslayer-kit
 
-bottled_ai「观者碎心」批次的运营与验证工具包。
+bottled_ai「观者碎心」批次的运营与验证工具包 — 驱动观者机器人走完三钥匙 → Act 4 → 击杀碎心（Corrupt Heart）。
 
-让 bottled_ai 机器人在**观者（OBSERVANT_HEARTSLAYER）**模式下走完三钥匙 → Act 4 → 击杀碎心（Corrupt Heart）；
-本仓库收录负责**守卫式启动、对局守望、卡死自愈、结果验证**的脚本与档案。
+守卫式启动、对局守望、卡死自愈、离线决策验证；从达成首次碎心击杀的项目中抽取。
 
-> 2026-10-05 里程碑：首次击杀碎心（seed `5N2LLKFRVCE5`，floor 56 / 1180 分 / 8 回合 / 零空闲回合）。
+> **里程碑** — 首次击杀碎心：2026-10-05，seed `5N2LLKFRVCE5`，floor 56 / 1180 分，8 回合战斗零空闲回合。
 
 [English](README.md) | **简体中文**
 
@@ -43,10 +42,12 @@ docs/      批次档案（首杀战报、分析、事故报告）
 
 ## 运行环境
 
-- CachyOS/Arch 笔记本 + Hyprland（本套按此调试；其它发行版需自行调整显示/OCR链路）
-- Steam 已登录（AutoLogin；`connection_log` 出现 `Logged On`）
-- ModTheSpire 经 `systemd-run --user` 拉起（`mts-ui` 单元）
-- 依赖：`python3`、`bash`、`grim`、`tesseract`(+`tesseract-data-eng`)、`xdotool`
+- Linux 桌面 + Hyprland 会话（OCR 链路用 `grim`；点击用 `xdotool` 于 `DISPLAY=:0`）
+- Steam 已登录（AutoLogin 亦可；`connection_log.txt` 出现 `Logged On`）
+- [ModTheSpire](https://github.com/kiooeht/ModTheSpire) + [CommunicationMod](https://github.com/ForgottenArbiter/CommunicationMod) 与 [bottled_ai](https://github.com/xaved88/bottled_ai) 检出
+- `bash`、`python3`（3.11+）、`grim`、`tesseract`(+`tesseract-data-eng`)、`xdotool`、systemd 用户会话
+
+在 CachyOS/Arch 上调试通过；其它发行版原则上可用——按需调整显示/OCR 链路与环境变量。
 
 **可移植性**（环境变量，默认值见各脚本头部）：
 
@@ -73,26 +74,36 @@ tail -f scripts/milestones.log
 python3 /path/to/tools/verify_live_run.py logs/runs/<log>
 ```
 
-## 设计要点与已知坑
+## 工作原理
 
-- **五重门控**：防 Steam 未登录时 MTS 拉到 0 个模组、防 CommunicationMod jar 被 Steam 校验回滚（指纹比对）、防残留实例双开。
-- **卡死防线（三重）**：
-  1. `watchdog-stuck.sh` 兜底（命中即止损+重开，整批挂起降级为损失一局）；
-  2. CommunicationMod 加固补丁（命令执行兜底 catch + 状态发送看门狗，见主仓 `ops/cm-fork/`）；
-  3. bot 端 `client.py` 回复超时 + `state` 探测自愈。
-- **OCR 点击**要求 MTS 窗口在最前；被其他全屏窗口盖住会 `GUARD-FAIL`（先收起其它全屏程序）。
-- 游戏更新可能覆盖 workshop 内的 CM jar —— 门控会拦截并提示重装（加固版指纹见 `EXPECT_CM_SHA`）。
+**五重门控启动。** 每道门控都源自实际踩过的坑：Steam 未登录时 MTS 会「成功」加载 0 个模组；游戏更新会重新校验并回滚 workshop 里的 CommunicationMod jar；上一批半死进程会毒化下一批。门控在动任何状态前大声失败（`GUARD-FAIL: …`）。`--dry-run` 只演练全部检查项，不启动任何东西。
 
-## docs/ 档案
+**卡死防线（三重）。** 项目遭遇过两类静默死锁（均有档案，见 `docs/`）：命令执行中的未捕获异常；以及 mod 活着但状态发送被静默抑制。防线刻意分层：
+
+1. 加固版 CommunicationMod — 命令执行兜底 catch（记录日志并强制补发状态）+ 15s 状态流看门狗；
+2. bot 端回复超时 — 25s 无回复则用 `state` 探测，最多 3 次；
+3. 外部 `watchdog-stuck.sh` — 最后手段：止损并重开小批（上限 5 次恢复），把「整批挂起」降级为「损失一局」。
+
+**OCR 点击。** `grim` → `tesseract tsv` → 找 `play` 词 → `xdotool` 点击。要求 MTS 窗口在当前工作区可见；被盖住则 `GUARD-FAIL: 未找到 Play 按钮`（先把其它全屏窗口收起）。
+
+## 疑难排查
+
+- 游戏更新可能覆盖 workshop 内的 CommunicationMod jar —— 指纹门控会拦截启动，直到重装加固版并更新 `EXPECT_CM_SHA`。
+- MTS 启动前 Steam 必须**完全登录**，否则模组列表为空。
+- 看护的恢复动作是「重开一批新局」，**不会**续跑卡住的残局。
+- `tools/` 需要带 `OBSERVANT_HEARTSLAYER` 策略的 bottled_ai 检出（fork 分支 `verify-localization-fix` 承载移植、comparator 修复与加固配方）。
+
+## docs/ 档案（中文）
 
 - `KILL-SUMMARY.md` — 首杀战报（2026-10-05）
 - `BATCH1-SUMMARY.md` / `HEART-FIGHT-ANALYSIS.md` / `RECORDS-SUMMARY.md` — 长批数据与心脏战分析
 - `INCIDENT-shop-hang.md` / `INCIDENT-wedge2-F59R3VP6YLV4.md` — 两次 CM 静默死锁事故报告
 
-## 相关
+## 致谢
 
-- 主项目：[blrain3/bottled_ai](https://github.com/blrain3/bottled_ai)（fork 分支 `verify-localization-fix`：碎心移植 + 心脏战评估修复 + CM 加固补丁）
-- 里程碑：首杀 `5N2LLKFRVCE5`（见 docs/）
+- [bottled_ai](https://github.com/xaved88/bottled_ai) — 机器人本体；本工具包为运行与验证它而生。
+- [CommunicationMod](https://github.com/ForgottenArbiter/CommunicationMod) / [spirecomm](https://github.com/ForgottenArbiter/spirecomm) — 游戏↔进程协议及其生态。
+- Slay the Spire © MegaCrit Games。本项目与官方无关；自动化对象为本地正版游戏。
 
 ## 许可
 
