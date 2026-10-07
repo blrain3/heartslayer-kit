@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # 历史用例：针对 XDMVJN 日志第 3 次 end 的「文件版」对照验证（旧 BigFight vs 新 HeartFight）。
 # 需先将 XDMVJN 日志恢复到 logs/runs/ 下（归档在 docs/ 或批次包里），并从 bottled_ai 仓库根运行。
 import json, re, glob

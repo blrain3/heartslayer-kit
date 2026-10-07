@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """解码 XDMVJN end#2 fix5 的完整出牌序列 + 每步伤害/净损演化; 并统计全批低效率回合。"""
 import json, sys, re, glob
+import logging
 from rs.machine.state import GameState
 from rs.machine.the_bots_memory_book import TheBotsMemoryBook
 from rs.calculator.interfaces.memory_items import MemoryItem, ResetSchedule, StanceType
@@ -72,7 +73,8 @@ for seed in ['XDMVJN','F7LEA71','5W8JLWDU','W3G8QK9','Z3ZV8A']:
             try:
                 stt=json.loads(l[l.find('{'):])['game_state']; cs=stt.get('combat_state') or {}
                 last=(cs.get('player') or {}).get('energy')
-            except Exception: pass
+            except Exception:
+                logging.debug("sim_decode: skip malformed game_state line")
         if l.startswith('Sending message: end'):
             tot+=1
             if (last or 0)>=2 and cur_plays<=2: lows+=1
