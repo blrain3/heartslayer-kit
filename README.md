@@ -76,6 +76,11 @@ python3 /path/to/tools/sim_batch_clean.py                           # old-vs-new
 | `sim_decode.py` | Full play sequence + per-step damage/HP-loss evolution for one decision |
 | `verify_file_version.py` | Historical case study (paired trace + synthetic cases) for the comparator fix |
 
+
+## Tools prerequisites
+
+All `tools/` scripts import the `rs.*` codebase directly. Run them from the root of a [bottled_ai](https://github.com/xaved88/bottled_ai) checkout that includes the `OBSERVANT_HEARTSLAYER` strategy (the `verify-localization-fix` branch on `blrain3/bottled_ai` carries the required ports and comparator fixes).
+
 ## Environment variables
 
 All scripts default to the standard layout; override as needed:

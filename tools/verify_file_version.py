@@ -22,8 +22,7 @@ resp_i = max(i for i in range(E) if lines[i].startswith('Response:'))
 mem_i = max(i for i in range(resp_i) if lines[i].startswith('Memory of next action:'))
 js = json.loads(lines[resp_i][lines[resp_i].find('{'):])
 _raw = re.sub(r'<(\w+)\.(\w+): [^>]*>', r'\1.\2', lines[mem_i].split('Memory of next action:', 1)[1].strip())
-mem = eval(_raw, {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId,
-                  'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
+mem = eval(compile(_raw, '<run_log_memory>', 'eval'), {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId, 'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
 
 def make_bs():
     gs = GameState(json.loads(lines[resp_i][lines[resp_i].find('{'):]),

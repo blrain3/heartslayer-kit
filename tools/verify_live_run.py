@@ -47,8 +47,7 @@ for e in range(len(ends)):
     mem_i = max(i for i in range(resp_i) if lines[i].startswith('Memory of next action:'))
     js = json.loads(lines[resp_i][lines[resp_i].find('{'):])
     _raw = re.sub(r'<(\w+)\.(\w+): [^>]*>', r'\1.\2', lines[mem_i].split('Memory of next action:', 1)[1].strip())
-    mem = eval(_raw, {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId,
-                      'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
+    mem = eval(compile(_raw, '<run_log_memory>', 'eval'), {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId, 'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
     res = {}
     for tag, cls in [('old', BigFightComparator), ('new', HeartFightComparator)]:
         gs = GameState(js, TheBotsMemoryBook(memory_general=dict(mem['memory_general']), memory_by_card=dict(mem['memory_by_card'])))
