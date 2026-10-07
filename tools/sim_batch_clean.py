@@ -22,8 +22,7 @@ def run_one(f, end_idx, cls):
     mem_i = max(i for i in range(resp_i) if lines[i].startswith('Memory of next action:'))
     js = json.loads(lines[resp_i][lines[resp_i].find('{'):])
     _raw = re.sub(r'<(\w+)\.(\w+): [^>]*>', r'\1.\2', lines[mem_i].split('Memory of next action:', 1)[1].strip())
-    mem = eval(_raw, {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId,
-                      'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
+    mem = eval(compile(_raw, '<run_log_memory>', 'eval'), {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId, 'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
     gs = GameState(js, TheBotsMemoryBook(memory_general=mem['memory_general'], memory_by_card=mem['memory_by_card']))
     bs = create_battle_state(gs)
     cmp = cls()

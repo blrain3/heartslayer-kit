@@ -7,7 +7,7 @@ P="$(cd "$(dirname "$0")" && pwd)"
 R="${BOTTLED_REPO:-$HOME/projects/bottled_ai}"
 LOG=$P/watchdog.log
 S=$P/watchdog-state
-mkdir -p $S
+mkdir -p "$S"
 THRESH=${THRESH:-180}
 INTERVAL=${INTERVAL:-30}
 MAX=${MAX_RECOVERIES:-5}
@@ -15,7 +15,7 @@ count=$(cat $S/recoveries 2>/dev/null || echo 0)
 log(){ echo "$(date '+%F %T') $*" >> $LOG; }
 
 if [ "${1:-}" = "--once" ]; then
-  G=$(ls -t $R/logs/runs/*.log 2>/dev/null | head -1)
+  G=$(ls -t "$R/logs/runs"/*.log 2>/dev/null | head -1)
   if ! pgrep -f "bottled_ai/main.py" >/dev/null; then echo "once: 无 bot -> 跳过"; exit 0; fi
   [ -z "$G" ] && { echo "once: 无日志"; exit 0; }
   age=$(( $(date +%s) - $(stat -c %Y "$G") ))
@@ -27,12 +27,12 @@ log "看护启动 (阈值 ${THRESH}s / 上限 ${MAX} / 已有恢复 ${count})"
 while true; do
   sleep $INTERVAL
   if ! pgrep -f "bottled_ai/main.py" >/dev/null; then continue; fi
-  G=$(ls -t $R/logs/runs/*.log 2>/dev/null | head -1)
+  G=$(ls -t "$R/logs/runs"/*.log 2>/dev/null | head -1)
   [ -z "$G" ] && continue
   age=$(( $(date +%s) - $(stat -c %Y "$G") ))
   if [ $age -gt $THRESH ]; then
     sleep 20
-    G2=$(ls -t $R/logs/runs/*.log 2>/dev/null | head -1)
+    G2=$(ls -t "$R/logs/runs"/*.log 2>/dev/null | head -1)
     age2=$(( $(date +%s) - $(stat -c %Y "$G2") ))
     if [ $age2 -gt $THRESH ] && pgrep -f "bottled_ai/main.py" >/dev/null; then
       last=$(grep -oE "Sending message: .{1,40}" "$G2" | tail -1)
@@ -41,7 +41,7 @@ while true; do
       $P/stop-batch.sh >> $LOG 2>&1
       sleep 8
       WATCHDOG_RECOVER=1 $P/launch-batch.sh 2 >> $LOG 2>&1
-      log "恢复#$count 重开后: $(ls -t $R/logs/runs/*.log | head -1)"
+      log "恢复#$count 重开后: $(ls -t "$R/logs/runs"/*.log | head -1)"
       if [ $count -ge $MAX ]; then
         log "已达恢复上限($MAX)，看护退出（需人工处理）"
         $P/stop-batch.sh >> $LOG 2>&1

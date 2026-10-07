@@ -23,8 +23,7 @@ json_state = json.loads(lines[resp_i][lines[resp_i].find('{'):])
 import re as _re
 _raw = lines[mem_i].split('Memory of next action:', 1)[1].strip()
 _raw = _re.sub(r'<(\w+)\.(\w+): [^>]*>', r'\1.\2', _raw)
-mem = eval(_raw,
-           {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId, 'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
+mem = eval(compile(_raw, '<run_log_memory>', 'eval'), {'MemoryItem': MemoryItem, 'ResetSchedule': ResetSchedule, 'CardId': CardId, 'CardType': CardType, 'StanceType': StanceType, 'PowerId': PowerId})
 book = TheBotsMemoryBook(memory_general=mem['memory_general'], memory_by_card=mem['memory_by_card'])
 gs = GameState(json_state, book)
 bs = create_battle_state(gs)

@@ -15,7 +15,7 @@ CMJAR="${CM_JAR:-$STEAM/steamapps/workshop/content/646570/2131373661/Communicati
 EXPECT_CM_SHA="${EXPECT_CM_SHA:-e2d51ad02b3face3dd4cb83d}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 fail(){ echo "GUARD-FAIL: $1"; exit 1; }
-if [ "${WATCHDOG_RECOVER:-}" != "1" ]; then mkdir -p $P/watchdog-state; echo 0 > $P/watchdog-state/recoveries; fi
+if [ "${WATCHDOG_RECOVER:-}" != "1" ]; then mkdir -p "$P/watchdog-state"; echo 0 > "$P/watchdog-state/recoveries"; fi
 [ -f "$CMJAR" ] || fail "CM jar 不存在: $CMJAR（检查 CM_JAR / STEAM_DIR 环境变量）"
 have=$(sha256sum "$CMJAR" | cut -c1-24)
 [ "$have" = "$EXPECT_CM_SHA" ] || fail "CM jar sha=${have}（预期 ${EXPECT_CM_SHA}）——可能被 Steam 回滚，先处理"
@@ -43,7 +43,7 @@ EOF2
 DISPLAY=:0 xdotool mousemove $L $T click 1
 systemctl --user stop heart-watch 2>/dev/null; sleep 1
 systemd-run --user --unit=heart-watch --collect $P/watch-milestones.sh >/dev/null
-if [ -x $P/watchdog-stuck.sh ] && ! systemctl --user is-active stuck-watch >/dev/null 2>&1; then
+if [ -x "$P/watchdog-stuck.sh" ] && ! systemctl --user is-active stuck-watch >/dev/null 2>&1; then
   systemctl --user reset-failed stuck-watch 2>/dev/null
   systemd-run --user --unit=stuck-watch --collect $P/watchdog-stuck.sh >/dev/null
 fi
